@@ -1,11 +1,14 @@
-import { _decorator, Color, Component, Label, Sprite, tween, UIOpacity, Vec3 } from 'cc';
+import { _decorator, Color, Component, Label, screen, Sprite, tween, UIOpacity, Vec3, view, View } from 'cc';
 import { Actor } from './Actor';
 import { ResultManger } from './ResultManger';
+import { GuideController } from './GuideController';
 const { ccclass, property } = _decorator;
 
 @ccclass('GameManager')
 export class GameManager extends Component {
     public static instance: GameManager;
+
+    @property(Sprite) background: Sprite;
 
     @property(Sprite) hit: Sprite;
     @property(Label) hitLabel: Label;
@@ -15,10 +18,32 @@ export class GameManager extends Component {
     @property([Actor]) players: Actor[] = [];
     @property([Actor]) enemies: Actor[] = [];
 
+    @property(GuideController) guide: GuideController;
     @property(ResultManger) result: ResultManger;
 
     onLoad() {
         GameManager.instance = this;
+
+        View.instance.on('canvas-resize', this.onResized, this);
+    }
+
+    start() {
+        this.guide.node.active = true;
+        this.onResized();
+    }
+
+    onResized() {
+        const standardRadio = 1.5; // standard aspect ratio, the aspect ratio is almost iPhone6 (landscape), generally as a standard design draft
+        const currentRadio = screen.windowSize.height / screen.windowSize.width; // aspect ratio   
+
+        if (currentRadio <= standardRadio) { 
+            var value = standardRadio / currentRadio;
+            this.background.node.scale = new Vec3(value, value, value);
+        }
+        else {
+            var value = currentRadio / standardRadio;
+            this.background.node.scale = new Vec3(value, value, value);
+        }
     }
 
     public onPlay() {

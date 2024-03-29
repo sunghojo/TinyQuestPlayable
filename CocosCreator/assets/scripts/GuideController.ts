@@ -10,17 +10,16 @@ export class GuideController extends Component {
     finger: Node;
 
     start() {
-        tween(this.finger.position)
-            .by(1, new Vec3(100, 300), {
-                easing: 'quartOut',
-                onUpdate: (target: Vec3, ratio: number) => {
-                    this.finger.position = target;
-                },
-                onComplete: () => {
-                    this.finger.position = new Vec3(120, 40);
-                }
-            })
-            .repeatForever()
+        let startPos = new Vec3(-100, 40);
+        let middlePos = new Vec3(120, 40);
+        let endPos = new Vec3(200, 300);
+
+        let tweenMove = tween(this.finger)
+            .to(1, {position: middlePos}, {easing: 'quartOut'})
+            .to(1, {position: endPos}, {easing: 'quartOut', onComplete: () => { this.finger.position = startPos}});
+
+        tween(this.finger)
+            .repeatForever(tweenMove)
             .start();
 
         this.background.node.on(Node.EventType.TOUCH_START, this.onTouchStart, this);
